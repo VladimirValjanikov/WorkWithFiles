@@ -2,36 +2,39 @@
 {
 	internal class Program
 	{
+		// C:\Users\Варнавский\Desktop\SkillFactory		
 		static void Main(string[] args)
-		{		
-			string value = Console.ReadLine();
-			//var di = new DirectoryInfo(@"C:\Users\Варнавский\Desktop\SkillFactory");
-			var di = new DirectoryInfo(value);
-			TimeSpan.FromMinutes(30);
+		{			
+			string path = Console.ReadLine();
 			
-			/*foreach (FileInfo file in di.GetFiles())
+			var di = new DirectoryInfo(path);
+			//var s = FileSystemAclExtensions.GetAccessControl(di);
+			try
 			{
-				
-				file.Delete();
-			}
-			foreach (DirectoryInfo dir in di.GetDirectories())
-			{
-				dir.Delete(true);
-			}*/
+				//if (!di.Exists)
+					//throw new Exception("Данного каталога не существует!");
 
+				foreach (FileInfo file in di.GetFiles())
+				{
+					var timeSpan = DateTime.Now - file.LastAccessTime;
 
-			/*try
-			{
-				DirectoryInfo dirInfo = new DirectoryInfo(@"C:\Users\Варнавский\Desktop\SkillFactory");
-				var dt = dirInfo.LastWriteTime;
-				Console.WriteLine(dt);
-				//dirInfo.Delete(true); 
-				//Console.WriteLine("Каталог удален");
+					if (timeSpan > TimeSpan.FromMinutes(30))
+						Console.WriteLine("fail");
+						//file.Delete();
+				}
+				foreach (DirectoryInfo dir in di.GetDirectories())
+				{
+					var timeSpan = DateTime.Now - dir.LastAccessTime;
+
+					if (timeSpan > TimeSpan.FromMinutes(30))
+						Console.WriteLine("papki");
+						//dir.Delete(true);
+				}
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex.Message);
-			}*/
+			}	
 		}
 	}
 }
