@@ -1,4 +1,4 @@
-﻿namespace Task2
+﻿namespace Task3
 {
 	internal class Program
 	{
@@ -10,14 +10,14 @@
 
 			try
 			{
-				foreach (DirectoryInfo dir in di.GetDirectories())				
-					size += DirSize(dir);				
+				foreach (DirectoryInfo dir in di.GetDirectories())
+					size += DirSize(dir);
 			}
 			catch (UnauthorizedAccessException ex)
 			{
 				Console.WriteLine(ex.Message);
 			}
-			return size;	
+			return size;
 		}
 		public static long FileSize(DirectoryInfo di)
 		{
@@ -49,10 +49,39 @@
 			
 			try
 			{
-				var di = new DirectoryInfo(path);							
+				var di = new DirectoryInfo(path);
+
 				if (!di.Exists)
 					throw new DirectoryNotFoundException("Данный каталог не найден!");
-				Console.WriteLine($"Размер директории {DirSize(di)} байт");			
+
+				long freeSize = 0;
+
+				long startSize = DirSize(di);
+				Console.WriteLine($"Исходный размер папки: {startSize} байт");
+			
+				foreach (FileInfo file in di.GetFiles())
+				{
+					var timeSpan = DateTime.Now - file.LastAccessTime;
+
+					if (timeSpan > TimeSpan.FromMinutes(30))
+					{
+						freeSize += file.Length;
+						file.Delete();
+					}					
+				}
+				foreach (DirectoryInfo dir in di.GetDirectories())
+				{
+					var timeSpan = DateTime.Now - dir.LastAccessTime;
+
+					if (timeSpan > TimeSpan.FromMinutes(30))
+					{
+						freeSize += DirSize(dir);
+						dir.Delete(true);
+					}											
+				}
+	
+				Console.WriteLine($"Освобождено: {freeSize} байт");
+				Console.WriteLine($"Текущий размер папки: {startSize - freeSize} байт");
 			}
 			catch (ArgumentNullException ex)
 			{
